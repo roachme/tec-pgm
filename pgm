@@ -1,0 +1,127 @@
+#!/bin/env bash
+
+PGNAME="tman-pgm"
+COMMAND=
+TASKDIR=
+PGNDIR=
+PGNURL="https://github.com/roach/tman-pgn"
+PRJNAME=
+TASKNAME=
+ISDEBUG=false
+
+function usage()
+{
+    cat << EOF
+Usage: tman pgm COMMAND [OPTION]... [ARGS]...
+    Plugin manager for tman
+
+    COMMAND list:
+      help      show this help message and exit
+      install   install plugins
+      list      list plugins
+      version   show version and exit
+EOF
+}
+
+function pgm_help()
+{
+    usage
+}
+
+function pgm_install()
+{
+    URL="$1"
+    NAME="$2"
+    # TODO: load it from config or cli option
+    PGNDIR="$HOME/.local/lib/tman/pgn"
+
+    if [ -z "$URL" ]; then
+        echo "plugin URL missing"
+        exit 1
+    fi
+    if [ -z "$NAME" ]; then
+        echo "plugin name missing"
+        exit 1
+    fi
+
+    DESTDIR="${PGNDIR}/${NAME}"
+    echo "DESTDIR: $DESTDIR"
+    echo "PGNAME: $PGNAME"
+    echo "---- done ---"
+
+    # TODO: compile/install each plugin if needed
+    if [ -L "$DESTDIR" ] || [ -d "$DESTDIR" ]; then
+        echo "already installed"
+        return 0
+    fi
+    git clone --recurse-submodules "$URL" "$DESTDIR"
+    return $?
+}
+
+#Name    Status  Description
+#pgm     inst    some plugin description
+function pgm_list()
+{
+    for pgn in $(find "$PGNDIR/" -maxdepth 1 -type d); do
+        echo "pgn: $pgn"
+    done
+    return 0
+}
+
+
+OPTS=$(getopt -o d:i:p:P:T:h --long debug:prj:,taskid:,pgndir:,taskdir:help -n "$PGNAME" -- "$@")
+if [ $? -ne 0 ]; then
+    #echo "error parsing options" >&2
+    exit 1
+fi
+
+## Reset the positional parameters to the parsed options
+eval set -- "$OPTS"
+
+while true; do
+    case "$1" in
+        -d)
+            ISDEBUG="$2"
+            shift 2
+            ;;
+        -i)
+            TASKNAME="$2"
+            shift 2
+            ;;
+        -p)
+            PRJNAME="$2"
+            shift 2
+            ;;
+        -P)
+            PGNDIR="$2"
+            shift 2
+            ;;
+        -T)
+            TASKDIR="$2"
+            shift 2
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "$PGNAME: invalid option '$1'" >&2
+            exit 1
+    esac
+done
+
+COMMAND="$1"
+shift 1
+
+if [ -z "$COMMAND" ]; then
+    echo "$PGNAME: no command passed"
+    exit 1
+elif [ "$COMMAND" = "help" ]; then
+    pgm_help "$@"
+elif [ "$COMMAND" = "install" ]; then
+    pgm_install "$@"
+elif [ "$COMMAND" = "list" ]; then
+    pgm_list "$@"
+else
+    echo "'$COMMAND': no such $PGNAME command"
+fi
