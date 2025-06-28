@@ -12,6 +12,18 @@ ISDEBUG=false
 # TODO: add option for config path on CLI
 CONFIG_FILE=
 
+function _check_args()
+{
+    # TODO: check board name when support is added
+    if [ -z "$PGNDIR" ]; then
+        elog "no plugin directory is passed"
+        exit 1
+    elif [ -z "$TASKDIR" ]; then
+        elog "no task directory is passed"
+        exit 1
+    fi
+}
+
 function find_config()
 {
     declare -a cfgs=(
@@ -125,17 +137,24 @@ function pgm_add()
 
 function pgm_del()
 {
-    local reponame="$1"
+    local pgname="$1"
 
-    if [ -z "$reponame" ]; then
-        echo "no reponame is provided. Try 'pgm help' for more info"
+    printf "Are you sure to delete pluign in %s? [y/N] " "$PGNDIR/$pgname"
+    read -r choice
+    if [ "$choice" != "Y" ] && [ "$choice" != "y" ] && [ "$choice" != "yes" ]; then
+        echo "plugin deletion is canceled"
         exit 1
-    elif [ ! -d "$PGNDIR/$reponame" ]; then
-        echo "$reponame: no such reponame. Try 'pgm help' for more info"
+    fi
+
+    if [ -z "$pgname" ]; then
+        elog "no plugin is provided. Try 'pgm help' for more info"
+        exit 1
+    elif [ ! -d "$PGNDIR/$pgname" ]; then
+        elog "$pgname: no such plugin. Try 'pgm help' for more info"
         exit 1
     else
-        echo "delete repo in $PGNDIR/$reponame"
-        #rm -rf "$PGNDIR/$reponame"
+        echo "delete plugin in $PGNDIR/$pgname"
+        rm -rf "$PGNDIR/$pgname"
     fi
 }
 
@@ -219,6 +238,8 @@ done
 
 COMMAND="$1"; shift 1
 
+
+_check_args
 find_config
 [ -f "$CONFIG_FILE" ] && jq empty "$CONFIG_FILE" || exit 1
 
