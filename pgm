@@ -243,16 +243,13 @@ _check_args
 find_config
 [ -f "$CONFIG_FILE" ] && jq empty "$CONFIG_FILE" || exit 1
 
-if [ -z "$COMMAND" ]; then
-    elog "no command passed"
-    exit 1
-elif [ "$COMMAND" = "add" ]; then
+if [ "$COMMAND" = "add" ]; then
     pgm_add "$@"
 elif [ "$COMMAND" = "del" ]; then
     pgm_del "$@"
 elif [ "$COMMAND" = "help" ]; then
     pgm_help "$@"
-elif [ "$COMMAND" = "list" ]; then
+elif [ -z "$COMMAND" ] || [ "$COMMAND" = "list" ]; then
     pgm_list "$@"
 elif [ "$COMMAND" = "sync" ]; then
     pgm_sync "$@"
