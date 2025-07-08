@@ -5,6 +5,7 @@ VERSION="v0.0.1"
 COMMAND=
 TASKDIR=
 PGNDIR=
+BRDNAME=
 PRJNAME=
 TASKNAME=
 ISDEBUG=false
@@ -195,7 +196,7 @@ function pgm_ver()
 }
 
 
-OPTS=$(getopt -o d:i:p:P:T:h --long debug:prj:,taskid:,pgndir:,taskdir:help -n "$PGNAME" -- "$@")
+OPTS=$(getopt -o b:d:i:p:P:T:h --long board:,debug:prj:,taskid:,pgndir:,taskdir:help -n "$PGNAME" -- "$@")
 if [ $? -ne 0 ]; then
     #echo "error parsing options" >&2
     exit
@@ -206,6 +207,10 @@ eval set -- "$OPTS"
 
 while true; do
     case "$1" in
+        -b)
+            BRDNAME="$2"
+            shift 2
+            ;;
         -d)
             ISDEBUG="$2"
             shift 2
