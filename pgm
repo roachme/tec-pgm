@@ -165,7 +165,7 @@ function pgm_list()
         local name="${pgn##*/}"
         local desc="tman plugin"
 
-        [ -f "$PGNDIR/$name/desc" ] && desc="$(cat "$PGNDIR/$name/desc")"
+        [ -s "$PGNDIR/$name/desc" ] && desc="$(cat "$PGNDIR/$name/desc")"
         printf "%-6s - %s\n" "$name" "$desc"
     done
 }
