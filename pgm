@@ -28,8 +28,8 @@ function _check_args()
 function find_config()
 {
     declare -a cfgs=(
-        "$HOME/.tman/pgns/pgm.json"
-        "$HOME/.config/tman/pgns/pgm.json"
+        "$HOME/.tman/pgn/pgm.json"
+        "$HOME/.config/tman/pgn/pgm.json"
     )
 
     for cfg in "${cfgs[@]}"; do
