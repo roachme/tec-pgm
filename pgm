@@ -1,6 +1,6 @@
 #!/bin/env bash
 
-PGNAME="tman-pgm"
+PGNAME="tec-pgm"
 VERSION="v0.0.1"
 COMMAND=
 TASKDIR=
@@ -28,8 +28,8 @@ function _check_args()
 function find_config()
 {
     declare -a cfgs=(
-        "$HOME/.tman/pgn/pgm.json"
-        "$HOME/.config/tman/pgn/pgm.json"
+        "$HOME/.tec/pgn/pgm.json"
+        "$HOME/.config/tec/pgn/pgm.json"
     )
 
     for cfg in "${cfgs[@]}"; do
@@ -61,8 +61,8 @@ function _pgm_init()
 function usage()
 {
     cat << EOF
-Usage: tman pgm COMMAND [OPTION]... [ARGS]...
-    Tman plugin manager
+Usage: tec pgm COMMAND [OPTION]... [ARGS]...
+    Tec plugin manager
 
     COMMAND list:
       add       install plugin
@@ -72,14 +72,14 @@ Usage: tman pgm COMMAND [OPTION]... [ARGS]...
       sync      update plugin (pull changes from remote repo)
       ver       show version and exit
 
-    Use 'tman pgm help COMMAND' to get help on command
+    Use 'tec pgm help COMMAND' to get help on command
 EOF
 }
 
 function _help_add()
 {
     cat << EOF
-Usage: tman pgm add [OPTION]... [URL]...
+Usage: tec pgm add [OPTION]... [URL]...
     Install a plugin via URL or from config file
 
     Arguments:
@@ -121,7 +121,7 @@ function pgm_add()
             #echo "-- pgnunits: $key -> $val"
         done < <(jq -r 'to_entries[] | "\(.key)=\(.value)"' <<< "$repo")
         repocfg["name"]="$(basename ${repocfg["link"]} ".git")"
-        repocfg["name"]=${repocfg["name"]#tman-}
+        repocfg["name"]=${repocfg["name"]#tec-}
 
         # check if repo is already cloned
         if [ -d "$PGNDIR/${repocfg["name"]}" ]; then
@@ -164,7 +164,7 @@ function pgm_list()
 {
     find "$PGNDIR/" -maxdepth 1 -type d ! -path "$PGNDIR/" | while read -r pgn; do
         local name="${pgn##*/}"
-        local desc="tman plugin"
+        local desc="tec plugin"
 
         [ -s "$PGNDIR/$name/desc" ] && desc="$(cat "$PGNDIR/$name/desc")"
         printf "%-6s - %s\n" "$name" "$desc"
@@ -185,7 +185,7 @@ function pgm_sync()
             #echo "-- pgnunits: $key -> $val"
         done < <(jq -r 'to_entries[] | "\(.key)=\(.value)"' <<< "$repo")
         repocfg["name"]="$(basename ${repocfg["link"]} ".git")"
-        repocfg["name"]=${repocfg["name"]#tman-}
+        repocfg["name"]=${repocfg["name"]#tec-}
         #git pull origin -q "${repocfg["link"]}" "$PGNDIR/${repocfg["name"]}" 2>/dev/null
     done <<< "$REPOS"
 }
